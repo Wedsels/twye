@@ -13,7 +13,7 @@ add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "C:/Users/fear8/Downloads/ModEngine-2.1.0.0-win64/External")
 
-add_library("twye" SHARED "twye.cpp")
+add_library("twye" SHARED "src/twye.cpp")
 target_include_directories("twye" PRIVATE ${CMAKE_SOURCE_DIR}/LibER/include)
 target_link_libraries("twye" PUBLIC "${CMAKE_SOURCE_DIR}/LibER/build/Release/libER_static.lib")
 
