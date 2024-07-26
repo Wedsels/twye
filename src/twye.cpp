@@ -1,4 +1,4 @@
-#include "Aho-Corasick.cpp"
+#include "ahocorasick.cpp"
 #include "common.cpp"
 #include "params.cpp"
 #include "hks.cpp"
@@ -18,8 +18,32 @@ bool modpath( HINSTANCE hinstDll ) {
 
     size_t pos = 0;
     while ( ( pos = common::modengine.find_last_of( '\\' ) ) != std::wstring::npos )
-        if ( std::filesystem::exists( ( common::modengine.erase( pos ) + L"\\modengine2_launcher.exe" ).c_str() ) )
+        if ( std::filesystem::exists( ( common::modengine.erase( pos ) + L"\\config_eldenring.toml" ).c_str() ) ) {
+            common::modengine += L"\\";
+
+            std::wifstream inputFile( common::modengine + L"config_eldenring.toml" );
+
+            std::wstringstream wss;
+            wss << inputFile.rdbuf();
+            std::wstring content = wss.str();
+            
+            inputFile.close();
+
+            size_t offset = content.find( L"\nmods = [" );
+            if ( offset == std::string::npos ) common::moddir = common::modengine + L"mod\\";
+            offset = content.find( L"path = \"", offset );
+            if ( offset == std::string::npos ) common::moddir = common::modengine + L"mod\\";
+            offset += 8;
+
+            std::wstring path = content.substr( offset, content.find( L"\"", offset ) - offset  );
+            
+            if ( path.find( L":\\" ) == std::string::npos ) common::moddir = common::modengine + path;
+            else common::moddir = path;
+
+            common::moddir += L"\\";
+            
             return true;
+        }
 
     return false;
 }
@@ -44,7 +68,7 @@ BOOL DllMain( HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved ) {
         else common::write( L"its version out-of-date" );
 
         if ( ::modpath( hinstDll ) ) {
-            common::write( L"found Modengine at ", common::modengine, L" in ", common::time(), L" microseconds" );
+            common::write( L"found Modengine at ", common::modengine, L"\nAnd the mod directory at ", common::moddir, L"\nIn ", common::time(), L" microseconds" );
             
             common::hks::hksmain();
         } else common::write( L"not found a modengine directory, and will not apply parts of the mod!" );

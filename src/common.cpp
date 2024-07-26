@@ -7,6 +7,7 @@
 #include <vector>
 
 std::wstring common::modengine;
+std::wstring common::moddir;
 
 HANDLE stdhandle;
 uint64_t tracktime;

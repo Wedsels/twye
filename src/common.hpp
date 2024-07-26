@@ -9,6 +9,7 @@
 class common {
     public:
         static std::wstring modengine;
+        static std::wstring moddir;
         
         static uint64_t time();
 

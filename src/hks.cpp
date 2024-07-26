@@ -427,12 +427,12 @@ void common::hks::hksmain() {
     for ( std::wstring i : { L"c0000.hks", L"c9997.hks" } ) {
         common::time();
 
-        auto path = common::modengine + L"\\mod\\action\\script\\" + i;
+        auto path = common::moddir + L"action\\script\\" + i;
         
         if ( !std::filesystem::exists( path ) ) {
             common::write( L"found missing files, acquiring " + i );
 
-            std::filesystem::create_directories( common::modengine + L"\\mod\\action\\script\\" );
+            std::filesystem::create_directories( common::moddir + L"action\\script\\" );
 
             if ( !::system( common::fromw( L"curl -o \"" + path + L"\" \"https://raw.githubusercontent.com/ividyon/EldenRingHKS/main/" + i + L"\"" ).c_str() ) ) {
                 common::write( L"succesfully acquired " + i );
