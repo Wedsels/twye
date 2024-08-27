@@ -22,7 +22,7 @@ size_t c9997( std::wstring path ) {
             "function Update()",
             "function TakeABreath()\n"
             "    local level = env(GetDamageLevel)\n"
-            "    local offset = 0.450 + (level / 100 + 0.20) * 5\n"
+            "    local offset = 0.650 - level / 35\n"
             "    if time - damagelevelers[level] > offset then\n"
             "        time = os.clock()\n"
             "        damagelevelers[level] = time\n"
@@ -96,30 +96,30 @@ size_t c0000( std::wstring path ) {
         },
         {
             "arts_cat == WEAPON_CATEGORY_SHORT_SWORD",
-            "arts_cat == dagger or checkSAI() == 92 and CanDualParry() ~= nil and env(ActionRequest, ACTION_ARM_L1) == TRUE and parriers[wep_cat] == dagger"
+            "arts_cat == dagger or checkSAI() == 92 and CanDualParry() ~= nil and (env(ActionRequest, ACTION_ARM_L1) == TRUE or Cancel(ACTION_ARM_L1)) and parriers[wep_cat] == dagger"
         },
         {
             "arts_cat == WEAPON_CATEGORY_CURVEDSWORD",
-            "arts_cat == curved or checkSAI() == 92 and CanDualParry() ~= nil and env(ActionRequest, ACTION_ARM_L1) == TRUE and parriers[wep_cat] == curved"
+            "arts_cat == curved or checkSAI() == 92 and CanDualParry() ~= nil and (env(ActionRequest, ACTION_ARM_L1) == TRUE or Cancel(ACTION_ARM_L1)) and parriers[wep_cat] == curved"
         },
         {
             "function GetHandChangeType(hand)",
             "function GetHandChangeType(hand)\n"
-            "    if CanDualParry() ~= nil then\n"
+            "    if CanDualParry() == hand then\n"
             "        return WEAPON_CHANGE_REQUEST_INVALID\n"
             "    end\n"
         },
         {
             "function Update()",
             "function checkENSAI()\n"
-            "    if CanDualParry() ~= nil and env(ActionRequest, ACTION_ARM_L1) == TRUE then\n"
+            "    if CanDualParry() ~= nil and (env(ActionRequest, ACTION_ARM_L1) == TRUE or Cancel(ACTION_ARM_L1)) then\n"
             "        return TRUE\n"
             "    end\n"
             "    return c_IsEnableSwordArts\n"
             "end\n"
             "\n"
             "function checkSAI()\n"
-            "    if CanDualParry() ~= nil and env(ActionRequest, ACTION_ARM_L1) == TRUE then\n"
+            "    if CanDualParry() ~= nil and (env(ActionRequest, ACTION_ARM_L1) == TRUE or Cancel(ACTION_ARM_L1)) then\n"
             "        SetVariable(\"IsEnoughArtPointsL2\", 0)\n"
             "        return 92\n"
             "    end\n"
@@ -128,7 +128,7 @@ size_t c0000( std::wstring path ) {
             "\n"
             "function checkSAH()\n"
             "    local parry = CanDualParry()\n"
-            "    if parry ~= nil and env(ActionRequest, ACTION_ARM_L1) == TRUE then\n"
+            "    if parry ~= nil and (env(ActionRequest, ACTION_ARM_L1) == TRUE or Cancel(ACTION_ARM_L1)) then\n"
             "        act(SetWeaponCancelType, env(GetWeaponCancelType, parry))\n"
             "        return parry\n"
             "    end\n"
@@ -165,9 +165,13 @@ size_t c0000( std::wstring path ) {
             "    local request = env(ActionRequest, ACTION_ARM_L1)\n"
             "    if env(ActionRequest, ACTION_ARM_R1) == TRUE and checkR1() == FALSE then\n"
             "        return TRUE\n"
-            "    elseif request == TRUE and CanDualParry() ~= nil then\n"
+            "    elseif (request == TRUE or Cancel(ACTION_ARM_L1)) and CanDualParry() ~= nil then\n"
             "        return FALSE\n"
             "    elseif request == TRUE and IsEnableDualWielding() ~= -1 and env(IsCOMPlayer) == FALSE then\n"
+            "        return FALSE\n"
+            "    elseif Cancel(ACTION_ARM_L1) and IsWeaponCanGuard() == TRUE then\n"
+            "        return TRUE\n"
+            "    elseif IsEnableDualWielding() ~= -1 then\n"
             "        return FALSE\n"
             "    end\n"
             "    return request\n"
@@ -175,7 +179,9 @@ size_t c0000( std::wstring path ) {
             "\n"
             "function checkL2()\n"
             "    local request = env(ActionRequest, ACTION_ARM_L2)\n"
-            "    if CanDualParry() ~= nil and env(ActionRequest, ACTION_ARM_L1) == TRUE and env(IsCOMPlayer) == FALSE then\n"
+            "    if CanDualParry() ~= nil and (env(ActionRequest, ACTION_ARM_L1) == TRUE or Cancel(ACTION_ARM_L1)) then\n"
+            "        return TRUE\n"
+            "    elseif Cancel(ACTION_ARM_L2) and (c_SwordArtsID == 92 or c_SwordArtsID == 93 or c_SwordArtsID == 97) then\n"
             "        return TRUE\n"
             "    end\n"
             "    return request\n"
@@ -202,10 +208,11 @@ size_t c0000( std::wstring path ) {
             "        then\n"
             "            return HAND_RIGHT\n"
             "        end\n"
-            "    end\n"
+            "    end\n\n"
         },
         {
             "global = {}",
+            "martial = WEAPON_CATEGORY_MARTIAL_ARTS\n"
             "claw = WEAPON_CATEGORY_CLAW\n"
             "fist = WEAPON_CATEGORY_FIST\n"
             "beast = WEAPON_CATEGORY_BEAST_CLAW\n"
@@ -251,6 +258,7 @@ size_t c0000( std::wstring path ) {
             "}\n"
             "\n"
             "parriers = {\n"
+            "    [martial] = dagger,\n"
             "    [claw] = dagger,\n"
             "    [fist] = dagger,\n"
             "    [rapier] = dagger,\n"
@@ -259,25 +267,27 @@ size_t c0000( std::wstring path ) {
             "    [backhand] = dagger,\n"
             "    [straight] = dagger,\n"
             "    [ll_straight] = dagger,\n"
-            "    [l_straight] = dagger,\n"
-            "    [l_rapier] = dagger,\n"
+            // "    [l_straight] = dagger,\n"
+            // "    [l_rapier] = dagger,\n"
             "    [perfume] = dagger,\n"
             "    [hammer] = dagger,\n"
             "    [axe] = dagger,\n"
             "    [whip] = dagger,\n"
             "    [flail] = dagger,\n"
             "    [beast] = dagger,\n"
-            "    [l_katana] = curved,\n"
+            // "    [l_katana] = curved,\n"
             "    [curved] = curved,\n"
             "    [katana] = curved,\n"
-            "    [scythe] = curved,\n"
-            "    [halberd] = curved,\n"
+            // "    [scythe] = curved,\n"
+            // "    [halberd] = curved,\n"
             "    [spear] = curved,\n"
             "    [twin] = curved,\n"
             "}\n"
             "\n"
             "powerstances = {\n"
             // poke, slash, weight, up, down
+            "    [martial] =\n"
+            "        { 0,1,0,0,0 },\n"
             "    [claw] =\n"
             "        { 0,1,0,0,0 },\n"
             "    [fist] =\n"
@@ -325,7 +335,7 @@ size_t c0000( std::wstring path ) {
             "    [l_hammer] =\n"
             "        { 0,1,3,0,0 },\n"
             "    [xl_straight] =\n"
-            "        { 0,1,3,0,0 },\n"
+            "        { 3,1,3,0,0 },\n"
             "    [xl_hammer] =\n"
             "        { 0,1,3,0,0 },\n"
             "    [ll_straight] =\n"
@@ -344,34 +354,42 @@ size_t c0000( std::wstring path ) {
             "    elseif b_[\"sprint\"] == 1 or env(IsCOMPlayer) == TRUE and env(GetSpEffectID, 100220) == TRUE then\n        act(LockonFixedAngleCancel)"
         },
         {
-            "    elseif env(ActionDuration, ACTION_ARM_L1) > 0 then",
-            "    elseif env(ActionDuration, ACTION_ARM_L1) > 0 or back and evasion then"
-        },
-        {
-            "        elseif env(ActionRequest, ACTION_ARM_BACKSTEP) == TRUE then",
-            "        elseif env(ActionRequest, ACTION_ARM_BACKSTEP) == TRUE or back and evasion then"
-        },
-        {
             "function ExecEvasion(backstep_limit, estep, is_usechainrecover)\n    if ",
             "function ExecEvasion(backstep_limit, estep, is_usechainrecover)\n    if env(ActionCancelRequest, ACTION_ARM_L3) == FALSE and "
         },
         {
             "function ExecEvent(state)",
             "function ExecEvent(state)\n"
-            "    if string.find(state, \"ttack\") then\n"
+            "    if (string.find(state, \"Attack\") or string.find(state, \"SwordArts\") or string.find(state, \"Magic\"))\n"
+            "    and not (string.find(state, \"Step\") or string.find(state, \"Roll\") or string.find(state, \"Shield\"))\n"
+            "    or state == \"W_DamageLv1_Small\" or state == \"W_DamageLv2_Middle\" then\n"
             "        b_[\"cancelrate\"] = os.clock()\n"
             "    else\n"
             "        b_[\"cancelrate\"] = 0\n"
             "    end\n\n"
+            "    b_[\"last\"] = state\n\n"
         },
+        { "env(ActionRequest, ACTION_ARM_CHANGE_STYLE) == FALSE", "env(ActionRequest, ACTION_ARM_CHANGE_STYLE) == FALSE and not Cancel(ACTION_ARM_CHANGE_STYLE)" },
+        { "env(IsGuardFromAtkCancel) == FALSE", "env(IsGuardFromAtkCancel) == FALSE and not Cancel(ACTION_ARM_L1)" },
+        { "    act(Unknown163)\n    act(DisallowAdditiveTurning, TRUE)", "    act(Unknown163)" },
+        { "    c_RollingAngle = env(GetRollAngle) * 0.009999999776482582\n    c_ArtsRollingAngle = env(GetSwordArtsRollAngle) * 0.009999999776482582", "    c_RollingAngle = GetVariable(\"MoveAngle\")\n    c_ArtsRollingAngle = GetVariable(\"MoveAngle\")" },
         {
             "    if env(ActionRequest, ACTION_ARM_ROLLING) == TRUE then",
             "\n"
-            "    c_RollingAngle = env(GetRollAngle) * 0.009999999776482582\n"
-            "    c_ArtsRollingAngle = env(GetSwordArtsRollAngle) * 0.009999999776482582\n"
-            "    local back = c_RollingAngle > 150 or c_RollingAngle < -150\n"
-            "    local evasion = env(ActionRequest, ACTION_ARM_SP_MOVE) == TRUE or env(ActionDuration, ACTION_ARM_SP_MOVE) > 0 and os.clock() - b_[\"cancelrate\"] < 0.3 and env(IsCOMPlayer) == FALSE\n\n"
-            "    if (env(ActionRequest, ACTION_ARM_ROLLING) == TRUE or evasion and GetVariable(\"MoveSpeedLevel\") > 0.05) and not back then"
+            "    if env(IsCOMPlayer) == FALSE then\n"
+            "        if env(ActionRequest, ACTION_ARM_EMERGENCYSTEP) == TRUE and (env(IsEmergencyEvasionPossible, 0) == TRUE or env(IsEmergencyEvasionPossible, 1) == TRUE) then\n"
+            "            return ATTACK_REQUEST_EMERGENCYSTEP\n"
+            "        end\n"
+            "        if env(ActionRequest, ACTION_ARM_SP_MOVE) == TRUE or Cancel(ACTION_ARM_SP_MOVE) then\n"
+            "            if not string.find(b_[\"last\"], \"W_Land\") and b_[\"sprint\"] ~= 1 and (env(GetSpEffectID, 100390) == FALSE and GetVariable(\"MoveAngle\") > 140 or GetVariable(\"MoveAngle\") < -140 or GetVariable(\"MoveSpeedLevel\") <= 0) then\n"
+            "                return ATTACK_REQUEST_BACKSTEP\n"
+            "            end\n"
+            "            return ATTACK_REQUEST_ROLLING\n"
+            "        end\n"
+            "        return ATTACK_REQUEST_INVALID\n"
+            "    end\n"
+            "\n"
+            "    if env(ActionRequest, ACTION_ARM_ROLLING) == TRUE then"
         },
         {
         
@@ -380,39 +398,63 @@ size_t c0000( std::wstring path ) {
             "\"W_AttackRightBackstep\", \"W_AttackRightHeavyDash\",\n"
             "        \"W_AttackLeftLight1\", \"W_AttackLeftHeavy1\", \"W_AttackBothBackstep\", \"W_AttackBothHeavyDash\","
         },
-        {
-        
-            "\"W_AttackRightLightStep\", \"W_AttackRightHeavy1Start\",\n"
-            "        \"W_AttackLeftLight1\", \"W_AttackLeftHeavy1\", \"W_AttackBothLightStep\", \"W_AttackBothHeavy1Start\",",
-            "\"W_AttackRightLightStep\", \"W_AttackRightHeavy1End\",\n"
-            "        \"W_AttackLeftLight1\", \"W_AttackLeftHeavy1\", \"W_AttackBothLightStep\", \"W_AttackBothHeavy1End\","
-        },
+        // {
+        //     "\"W_AttackRightLightStep\", \"W_AttackRightHeavy1Start\",\n"
+        //     "        \"W_AttackLeftLight1\", \"W_AttackLeftHeavy1\", \"W_AttackBothLightStep\", \"W_AttackBothHeavy1Start\",",
+        //     "\"W_AttackRightLightStep\", \"W_AttackRightHeavy1End\",\n"
+        //     "        \"W_AttackLeftLight1\", \"W_AttackLeftHeavy1\", \"W_AttackBothLightStep\", \"W_AttackBothHeavy1End\","
+        // },
         {
         
             "            if env(GetSpEffectID, 100020) == TRUE then",
-            "            if env(GetSpEffectID, 100020) == TRUE and env(ActionRequest, ACTION_ARM_RIDEON) == TRUE then"
+            "            if env(GetSpEffectID, 100020) == TRUE and env(IsOnMount) == TRUE then"
         },
         {
         
             "                SetVariable(\"ToggleDash\", 0)\n            else",
-            "                SetVariable(\"ToggleDash\", 0)\n            elseif env(ActionRequest, ACTION_ARM_RIDEON) == TRUE then"
+            "                SetVariable(\"ToggleDash\", 0)\n            elseif env(IsOnMount) == TRUE then"
         },
         {
             "function Update()",
+            "function Cancel(actype)\n"
+            "    local dur = env(ActionDuration, actype)\n"
+            "    return dur > 0 and dur < 50 and os.clock() - b_[\"cancelrate\"] < 0.5\n"
+            "end\n"
+            "\n"
             "function Update()\n"
             "    act(AddSpEffect, 20380100)\n"
+            "    act(AddSpEffect, 3450)\n"
             "\n"
-            "    if (env(ActionDuration, ACTION_ARM_L3) >= 250 and GetVariable(\"MoveSpeedLevel\") > 0.05\n"
-            "    or env(ActionDuration, ACTION_ARM_L3) > 0 and GetVariable(\"MoveSpeedLevel\") > 0.4000000059604645 and c_IsStealth == FALSE)\n"
+            "    if (env(ActionDuration, ACTION_ARM_L3) >= 250\n"
+            "    or env(ActionDuration, ACTION_ARM_L3) > 0 and GetVariable(\"MoveSpeedLevel\") > 0 and c_IsStealth == FALSE)\n"
             "    and env(GetStamina) > 0 and env(IsCOMPlayer) == FALSE then\n"
             "        b_[\"sprint\"] = 1\n"
             "    elseif env(ActionCancelRequest, ACTION_ARM_L3) == FALSE then\n"
             "        b_[\"sprint\"] = 0\n"
             "    end\n"
+
+
+
+            "    if env(ActionDuration, ACTION_ARM_R2) > 120 and string.find(b_[\"last\"], \"Heavy.Start\") then\n"
+            "        b_[\"last\"] = \"\"\n"
+            "    end\n"
+            "    if env(ActionDuration, ACTION_ARM_R2) <= 0 and string.find(b_[\"last\"], \"Heavy.Start\") then\n"
+            "        ExecEventAllBody(b_[\"last\"]:gsub(\"Start\", \"End\"))\n"
+            "    end\n"
+
+
+            "    if c_Style == HAND_RIGHT_BOTH then act(AddSpEffect, 7210)\n"
+            "    else act(ClearSpEffect, 7210) end\n"
+            "    if c_Style == HAND_LEFT_BOTH then act(AddSpEffect, 7220)\n"
+            "    else act(ClearSpEffect, 7220) end\n"
+            "    if CanDualParry() == nil then act(AddSpEffect, 102000)\n"
+            "    else act(ClearSpEffect, 102000) end\n"
         },
         {
             "global = {}",
-            "b_ = {}\n\nglobal = {}"
+            "b_ = {}\n"
+            "\n"
+            "global = {}"
         },
     };
     
@@ -459,3 +501,14 @@ void common::hks::hksmain() {
         ::SetFileAttributesW( path.c_str(), FILE_ATTRIBUTE_READONLY );
     }
 }
+
+
+// maybe make the first r1 chain into the second r2
+
+// can nothing be done to the startup of r1's, such as the r2?
+
+// maybe make cancels also happen a while into the attack, the only non-cancel window would be the middle of attack
+
+// maybe make staves and catalysts parry
+
+// would be nice to replace horse and ladder sprint with the new keybind

@@ -20,8 +20,14 @@ uint64_t common::time() {
     return diff;
 }
 
-void common::locateconsole() {
+void common::locateconsole( bool unique = true ) {
     ::AllocConsole();
+
+    if ( !unique ) {
+        FILE* out;
+        freopen_s(&out, "CON", "w", stdout);
+        return;
+    }
 
     HWND consoleWindow = ::GetConsoleWindow();
 

@@ -13,7 +13,7 @@ class common {
         
         static uint64_t time();
 
-        static void locateconsole();
+        static void locateconsole( bool unique );
 
         template <typename... T>
         static void write( T... content );

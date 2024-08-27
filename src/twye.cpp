@@ -49,15 +49,12 @@ bool modpath( HINSTANCE hinstDll ) {
 }
 
 void core() {
+    common::write( L"started waiting for game params..." );
     from::CS::SoloParamRepository::wait_for_params( -1 );
-    
     common::write( L"modified game parameters", L" in ", common::params::parammain(), L" microseconds" );
     
-    ::Sleep( 2500 );
-
-    HWND consoleWindow = ::GetConsoleWindow();
-    ::FreeConsole();
-    ::PostMessageW(consoleWindow, WM_CLOSE, 0, 0);
+    ::system( "pause" );
+    ShowWindow( ::GetConsoleWindow(), SW_HIDE );
 }
 
 BOOL DllMain( HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved ) {
