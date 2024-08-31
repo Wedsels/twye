@@ -349,7 +349,7 @@ size_t c0000( std::wstring path ) {
 // movement
         {
             "env(ActionRequest, ACTION_ARM_L3) == TRUE",
-            "env(ActionCancelRequest, ACTION_ARM_L3) == TRUE and not b_[\"sprint\"]"
+            "env(ActionRequest, ACTION_ARM_L3) == TRUE and not b_[\"sprint\"]"
         },
         {
             "    elseif env(GetSpEffectID, 100220) == TRUE then",
@@ -438,7 +438,7 @@ size_t c0000( std::wstring path ) {
             "    act(AddSpEffect, 3450)\n"
             "\n"
             "    if (env(ActionDuration, ACTION_ARM_L3) >= 250\n"
-            "    or env(ActionDuration, ACTION_ARM_L3) > 0 and GetVariable(\"MoveSpeedLevel\") > 0 and c_IsStealth == FALSE)\n"
+            "    or env(ActionDuration, ACTION_ARM_L3) > 0 and GetVariable(\"MoveSpeedLevel\") > 0)\n"
             "    and env(GetStamina) > 5 then\n"
             "        b_[\"sprint\"] = true\n"
             "    elseif env(ActionCancelRequest, ACTION_ARM_L3) == FALSE then\n"
