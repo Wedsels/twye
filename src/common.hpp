@@ -14,7 +14,7 @@ class common {
         
         static uint64_t time();
 
-        static const bool exclusive = true;
+        static const bool exclusive = false;
         static void locateconsole();
 
         template <typename... T>
