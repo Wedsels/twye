@@ -1,7 +1,7 @@
 # INSTALLATION
 
-- Put the twye.dll somewhere with the modengine directory.
+- Put the twye.dll within the modengine directory.
 
-- Edit modengine config_eldenring.toml to include the location you put the twye.dll
+- Edit modengine config_eldenring.toml to include the relative location to the twye.dll
 >     external_dlls = [
 >          "Relative/Folder/Path/To/twye.dll",
