@@ -48,9 +48,9 @@ uint64_t common::params::parammain() {
     common::time();
 
     for ( auto [id, row] : from::param::Bullet ) {
-        if ( row.isAttackSFX != 1 || row.isPenetrateChr + row.isPenetrateMap + row.isPenetrateObj > 0 || row.life < 5 || row.atkAttribute != 254 || row.atkId_Bullet == -1 ) continue;
+        if ( row.isAttackSFX != 1 || row.isPenetrateChr + row.isPenetrateMap + row.isPenetrateObj > 0 || row.life < 5 || row.atkAttribute != 54 || row.atkId_Bullet == -1 ) continue;
 
-        row.life *= 25;
+        row.life *= 5;
         row.maxVellocity *= 20;
         row.accelOutRange = 20;
         row.accelInRange = 450;
@@ -171,13 +171,13 @@ uint64_t common::params::parammain() {
         auto& right = from::param::SpEffectParam[7210].first;
         basesp( right );
 
-        right.effectEndurance = -1;
+        right.effectEndurance = 0.01f;
         right.wepParamChange = 1;
-        right.changeStrengthPoint = 11;
-        right.changeAgilityPoint = 22;
-        right.changeMagicPoint = 22;
-        right.changeFaithPoint = 22;
-        right.changeLuckPoint = 22;
+        right.changeStrengthPoint = 5;
+        right.changeAgilityPoint = 5;
+        right.changeMagicPoint = 5;
+        right.changeFaithPoint = 5;
+        right.changeLuckPoint = 5;
         right.bAdjustStrengthAblity = 1;
         right.bAdjustAgilityAblity = 1;
         right.bAdjustMagicAblity = 1;
@@ -187,32 +187,27 @@ uint64_t common::params::parammain() {
         right.magParamChange = 1;
         right.miracleParamChange = 1;
         right.shamanParamChange = 1;
-        right.throwAttackParamChange = 1;
+        // right.throwAttackParamChange = 1;
 
         auto& left = from::param::SpEffectParam[7220].first;
         left = right;
         left.wepParamChange = 2;
+
+        auto& strengthright = from::param::SpEffectParam[7230].first;
+        strengthright = right;
+        strengthright.changeStrengthPoint = -5;
+        strengthright.changeAgilityPoint = 0;
+        strengthright.changeMagicPoint = 0;
+        strengthright.changeFaithPoint = 0;
+        strengthright.changeLuckPoint = 0;
+        right.bAdjustAgilityAblity = 0;
+        right.bAdjustMagicAblity = 0;
+        right.bAdjustFaithAblity = 0;
+
+        auto& strengthleft = from::param::SpEffectParam[7240].first;
+        strengthleft = strengthright;
+        strengthleft.wepParamChange = 2;
     }
-
-
-    // from::param::Bullet[10464010].first = from::param::Bullet[20007601].first;
-    // auto& bu = from::param::Bullet[10464010].first;
-    // bu.atkId_Bullet = 0;
-    // bu.sfxId_Bullet = -1;
-    // bu.sfxId_Flick = -1;
-    // bu.sfxId_Hit = -1;
-    // bu.hitRadius = 0.025f;
-    // bu.hitRadiusMax = 0.025f;
-    // bu.spEffectId0 = 6909;
-    // for ( auto [id, row] : from::param::Bullet ) {
-    //     if ( id == 10464010 || row.HitBulletID > 0 ) continue;
-    //     row.HitBulletID = 10464010;
-    // }
     
     return common::time();
 }
-
-/*
-    Changing the wepmotionCategory and spAtkcategory to copy that of the right hand weapon, would create the ability for use the dual heavy attacks
-    could also copy over the guardmotion thing which would change wep position
-*/

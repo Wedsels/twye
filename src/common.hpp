@@ -5,6 +5,7 @@
 #include <Windows.h>
 #include <string>
 #include <vector>
+#include <set>
 
 class common {
     public:
@@ -13,12 +14,13 @@ class common {
         
         static uint64_t time();
 
-        static void locateconsole( bool unique );
+        static const bool exclusive = true;
+        static void locateconsole();
 
         template <typename... T>
         static void write( T... content );
 
-        static std::pair<std::string, size_t> replace( std::string string, std::vector<std::pair<std::string, std::string>> pattern, bool file );
+        static std::pair<std::string, size_t> replace( std::string string, std::vector<std::pair<std::string, std::string>> pattern, bool file, std::set<std::string> careful );
         
         static std::string fromw( std::wstring string );
     
@@ -33,7 +35,7 @@ class common {
 
     class aho {
         public:
-            static std::pair<std::string, size_t> replacetext( std::string content, std::vector<std::pair<std::string, std::string>> pattern );
+            static std::pair<std::string, size_t> replacetext( std::string content, std::vector<std::pair<std::string, std::string>> pattern, std::set<std::string> careful );
     };
 
     class twye {

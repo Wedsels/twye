@@ -1,7 +1,10 @@
 #include "common.hpp"
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdio>
 #include <fstream>
+#include <set>
 #include <sstream>
 #include <chrono>
 #include <vector>
@@ -20,12 +23,12 @@ uint64_t common::time() {
     return diff;
 }
 
-void common::locateconsole( bool unique = true ) {
+void common::locateconsole() {
     ::AllocConsole();
 
-    if ( !unique ) {
+    if ( !exclusive ) {
         FILE* out;
-        freopen_s(&out, "CON", "w", stdout);
+        freopen_s( &out, "CON", "w", stdout );
         return;
     }
 
@@ -64,10 +67,13 @@ void common::write( T... content ) {
     wss << L"twye has ";
     ( wss << ... << content ) << "\n\n";
     
-    ::WriteConsoleW( stdhandle, wss.str().c_str(), (DWORD)wss.str().size(), NULL, NULL );
+    if ( !exclusive )
+        ::printf( fromw( wss.str() ).c_str() );
+    else
+        ::WriteConsoleW( stdhandle, wss.str().c_str(), (DWORD)wss.str().size(), NULL, NULL );
 }
 
-std::pair<std::string, size_t> common::replace( std::string string, std::vector<std::pair<std::string, std::string>> pattern, bool file ) {
+std::pair<std::string, size_t> common::replace( std::string string, std::vector<std::pair<std::string, std::string>> pattern, bool file, std::set<std::string> careful = {} ) {
     std::string content = string;
 
     if ( file ) {
@@ -80,7 +86,7 @@ std::pair<std::string, size_t> common::replace( std::string string, std::vector<
         inputFile.close();
     }
 
-    auto result = common::aho::replacetext( content, pattern );
+    auto result = common::aho::replacetext( content, pattern, careful );
 
     if ( file ) {
         std::ofstream outputFile( string, std::ios::trunc );

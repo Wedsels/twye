@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <deque>
+#include <set>
 #include <map>
 
 struct TrieCor {
@@ -48,7 +49,7 @@ struct TrieCor {
             front.push_back( code.second );
         }
 
-        for ( int i=0; i<( int )front.size(); i++ ) {
+        for ( int i=0; i<(int)front.size(); i++ ) {
             Node* node = front[i];
 
             for ( std::pair<char, Node*> code : node->queue ) {
@@ -68,7 +69,9 @@ struct TrieCor {
         }
     }
     
-    std::pair<std::string, size_t> process_string( std::string& str ) {
+    std::pair<std::pair<std::string, size_t>, std::set<std::string>> process_string( std::string& str ) {
+        std::set<std::string> gathered = {};
+
         std::string replaced = str;
 
         Node* node = core;
@@ -83,21 +86,30 @@ struct TrieCor {
             else node = node->queue[c];
             
             auto string = node->string;
-            if (  string.first != ""  ) {
+            if ( string.first != "" ) {
                 size_t size = string.first.size();
                 replaced.replace(  index - size + 1 + offset, size, string.second  );
                 offset += string.second.size() - size;
+
+                gathered.emplace( string.first );
             }
 
             index++;
         }
         
-        return { replaced, replaced.size() };
+        return { { replaced, replaced.size() }, gathered };
     }
 };
 
-std::pair<std::string, size_t> common::aho::replacetext( std::string content, std::vector<std::pair<std::string, std::string>> pattern ) {
+std::pair<std::string, size_t> common::aho::replacetext( std::string content, std::vector<std::pair<std::string, std::string>> pattern, std::set<std::string> careful ) {
     TrieCor trie;
     trie.init( pattern );
-    return trie.process_string(  content  );
+
+    auto val = trie.process_string( content );
+
+    for ( auto i : pattern )
+        if ( !val.second.contains( i.first ) && !careful.contains( i.first ) )
+            common::write( L"failed to replace\n\"", i.first.c_str(), "\"" );
+
+    return val.first;
 }

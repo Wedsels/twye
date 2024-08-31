@@ -2,13 +2,20 @@
 
 #include <filesystem>
 
-void careful( std::string original, std::string replace, std::vector<std::pair<std::string, std::string>>& target ) {
+void carefully( std::string original, std::string replace, std::vector<std::pair<std::string, std::string>>& target, std::set<std::string>& careful ) {
     target.push_back( { "= " + original, "= " + replace } );
     target.push_back( { original + " ==", replace + " ==" } );
     target.push_back( { "(" + original + ")", "(" + replace + ")" } );
     target.push_back( { "[" + original + "]", "[" + replace + "]" } );
     target.push_back( { "(" + original + ",", "(" + replace + "," } );
     target.push_back( { " " + original + ")", " " + replace + ")" } );
+
+    careful.emplace( "= " + original );
+    careful.emplace( original + " ==" );
+    careful.emplace( "(" + original + ")" );
+    careful.emplace( "[" + original + "]" );
+    careful.emplace( "(" + original + "," );
+    careful.emplace( " " + original + ")" );
 }
 
 size_t c9997( std::wstring path ) {
@@ -56,7 +63,7 @@ size_t c9997( std::wstring path ) {
         },
     };
 
-    return common::replace( common::fromw( path ), pattern , true ).second;
+    return common::replace( common::fromw( path ), pattern , true, {} ).second;
 }
 
 size_t c0000( std::wstring path ) {
@@ -267,19 +274,14 @@ size_t c0000( std::wstring path ) {
             "    [backhand] = dagger,\n"
             "    [straight] = dagger,\n"
             "    [ll_straight] = dagger,\n"
-            // "    [l_straight] = dagger,\n"
-            // "    [l_rapier] = dagger,\n"
             "    [perfume] = dagger,\n"
             "    [hammer] = dagger,\n"
             "    [axe] = dagger,\n"
             "    [whip] = dagger,\n"
             "    [flail] = dagger,\n"
             "    [beast] = dagger,\n"
-            // "    [l_katana] = curved,\n"
             "    [curved] = curved,\n"
             "    [katana] = curved,\n"
-            // "    [scythe] = curved,\n"
-            // "    [halberd] = curved,\n"
             "    [spear] = curved,\n"
             "    [twin] = curved,\n"
             "}\n"
@@ -347,11 +349,11 @@ size_t c0000( std::wstring path ) {
 // movement
         {
             "env(ActionRequest, ACTION_ARM_L3) == TRUE",
-            "env(ActionCancelRequest, ACTION_ARM_L3) == TRUE and b_[\"sprint\"] == 0"
+            "env(ActionCancelRequest, ACTION_ARM_L3) == TRUE and not b_[\"sprint\"]"
         },
         {
             "    elseif env(GetSpEffectID, 100220) == TRUE then",
-            "    elseif b_[\"sprint\"] == 1 or env(IsCOMPlayer) == TRUE and env(GetSpEffectID, 100220) == TRUE then\n        act(LockonFixedAngleCancel)"
+            "    elseif b_[\"sprint\"] or env(IsCOMPlayer) == TRUE and env(GetSpEffectID, 100220) == TRUE then\n        act(LockonFixedAngleCancel)"
         },
         {
             "function ExecEvasion(backstep_limit, estep, is_usechainrecover)\n    if ",
@@ -372,6 +374,22 @@ size_t c0000( std::wstring path ) {
         { "env(ActionRequest, ACTION_ARM_CHANGE_STYLE) == FALSE", "env(ActionRequest, ACTION_ARM_CHANGE_STYLE) == FALSE and not Cancel(ACTION_ARM_CHANGE_STYLE)" },
         { "env(IsGuardFromAtkCancel) == FALSE", "env(IsGuardFromAtkCancel) == FALSE and not Cancel(ACTION_ARM_L1)" },
         { "    act(Unknown163)\n    act(DisallowAdditiveTurning, TRUE)", "    act(Unknown163)" },
+        { " or env(MovementRequestDuration) <= 0", "" },
+        { "env(ActionRequest, ACTION_ARM_SP_MOVE)", "env(ActionRequest, ACTION_ARM_L3) == TRUE" },
+        { "evasionRequest == TRUE", "evasionRequest" },
+        { "env(ActionRequest, ACTION_ARM_L3) == FALSE", "env(ActionRequest, ACTION_ARM_SP_MOVE) == FALSE" },
+        { "if env(ActionDuration, ACTION_ARM_SP_MOVE) > 0 then", "if env(ActionDuration, ACTION_ARM_L3) > 0 then" },
+        { "env(ActionDuration, ACTION_ARM_SP_MOVE) <= 0", "env(ActionDuration, ACTION_ARM_L3) <= 0" },
+        {
+            "    local sp_action = env(ActionDuration, ACTION_ARM_SP_MOVE)",
+            "    local sp_action = env(ActionDuration, ACTION_ARM_SP_MOVE)\n"
+            "        if sp_action > 0 then\n"
+            "            LadderSendCommand(LADDER_EVENT_COMMAND_EXIT)\n"
+            "            LadderSetActionState(LADDER_ACTION_INVALID)\n"
+            "            ExecEvent(\"W_LadderDrop\")\n"
+            "            return TRUE\n"
+            "        end\n"
+        },
         { "    c_RollingAngle = env(GetRollAngle) * 0.009999999776482582\n    c_ArtsRollingAngle = env(GetSwordArtsRollAngle) * 0.009999999776482582", "    c_RollingAngle = GetVariable(\"MoveAngle\")\n    c_ArtsRollingAngle = GetVariable(\"MoveAngle\")" },
         {
             "    if env(ActionRequest, ACTION_ARM_ROLLING) == TRUE then",
@@ -380,8 +398,8 @@ size_t c0000( std::wstring path ) {
             "        if env(ActionRequest, ACTION_ARM_EMERGENCYSTEP) == TRUE and (env(IsEmergencyEvasionPossible, 0) == TRUE or env(IsEmergencyEvasionPossible, 1) == TRUE) then\n"
             "            return ATTACK_REQUEST_EMERGENCYSTEP\n"
             "        end\n"
-            "        if env(ActionRequest, ACTION_ARM_SP_MOVE) == TRUE or Cancel(ACTION_ARM_SP_MOVE) then\n"
-            "            if not string.find(b_[\"last\"], \"W_Land\") and b_[\"sprint\"] ~= 1 and (env(GetSpEffectID, 100390) == FALSE and GetVariable(\"MoveAngle\") > 140 or GetVariable(\"MoveAngle\") < -140 or GetVariable(\"MoveSpeedLevel\") <= 0) then\n"
+            "        if env(ActionRequest, ACTION_ARM_SP_MOVE) == TRUE or (string.find(b_[\"last\"], \"W_Land\") or Cancel(ACTION_ARM_SP_MOVE)) and env(ActionDuration, ACTION_ARM_SP_MOVE) > 0 and env(IsLanding) == TRUE then\n"
+            "            if env(GetSpEffectID, 100390) == FALSE and GetVariable(\"MoveAngle\") > 140 or GetVariable(\"MoveAngle\") < -140 or GetVariable(\"MoveSpeedLevel\") <= 0 then\n"
             "                return ATTACK_REQUEST_BACKSTEP\n"
             "            end\n"
             "            return ATTACK_REQUEST_ROLLING\n"
@@ -398,12 +416,6 @@ size_t c0000( std::wstring path ) {
             "\"W_AttackRightBackstep\", \"W_AttackRightHeavyDash\",\n"
             "        \"W_AttackLeftLight1\", \"W_AttackLeftHeavy1\", \"W_AttackBothBackstep\", \"W_AttackBothHeavyDash\","
         },
-        // {
-        //     "\"W_AttackRightLightStep\", \"W_AttackRightHeavy1Start\",\n"
-        //     "        \"W_AttackLeftLight1\", \"W_AttackLeftHeavy1\", \"W_AttackBothLightStep\", \"W_AttackBothHeavy1Start\",",
-        //     "\"W_AttackRightLightStep\", \"W_AttackRightHeavy1End\",\n"
-        //     "        \"W_AttackLeftLight1\", \"W_AttackLeftHeavy1\", \"W_AttackBothLightStep\", \"W_AttackBothHeavy1End\","
-        // },
         {
         
             "            if env(GetSpEffectID, 100020) == TRUE then",
@@ -427,28 +439,25 @@ size_t c0000( std::wstring path ) {
             "\n"
             "    if (env(ActionDuration, ACTION_ARM_L3) >= 250\n"
             "    or env(ActionDuration, ACTION_ARM_L3) > 0 and GetVariable(\"MoveSpeedLevel\") > 0 and c_IsStealth == FALSE)\n"
-            "    and env(GetStamina) > 0 and env(IsCOMPlayer) == FALSE then\n"
-            "        b_[\"sprint\"] = 1\n"
+            "    and env(GetStamina) > 5 then\n"
+            "        b_[\"sprint\"] = true\n"
             "    elseif env(ActionCancelRequest, ACTION_ARM_L3) == FALSE then\n"
-            "        b_[\"sprint\"] = 0\n"
+            "        b_[\"sprint\"] = false\n"
             "    end\n"
-
-
-
             "    if env(ActionDuration, ACTION_ARM_R2) > 120 and string.find(b_[\"last\"], \"Heavy.Start\") then\n"
             "        b_[\"last\"] = \"\"\n"
             "    end\n"
             "    if env(ActionDuration, ACTION_ARM_R2) <= 0 and string.find(b_[\"last\"], \"Heavy.Start\") then\n"
             "        ExecEventAllBody(b_[\"last\"]:gsub(\"Start\", \"End\"))\n"
             "    end\n"
-
-
-            "    if c_Style == HAND_RIGHT_BOTH then act(AddSpEffect, 7210)\n"
-            "    else act(ClearSpEffect, 7210) end\n"
-            "    if c_Style == HAND_LEFT_BOTH then act(AddSpEffect, 7220)\n"
-            "    else act(ClearSpEffect, 7220) end\n"
-            "    if CanDualParry() == nil then act(AddSpEffect, 102000)\n"
-            "    else act(ClearSpEffect, 102000) end\n"
+            "    if IsEnableDualWielding() == -1 then\n"
+            "        act(AddSpEffect, 7210)\n"
+            "        act(AddSpEffect, 7220)\n"
+            "    end\n"
+            "    if c_Style == HAND_RIGHT_BOTH or c_Style == HAND_LEFT_BOTH then\n"
+            "        act(AddSpEffect, 7230)\n"
+            "        act(AddSpEffect, 7240)\n"
+            "    end\n"
         },
         {
             "global = {}",
@@ -458,11 +467,12 @@ size_t c0000( std::wstring path ) {
         },
     };
     
-    ::careful( "c_SwordArtsID", "checkSAI()", pattern );
-    ::careful( "c_SwordArtsHand", "checkSAH()", pattern );
-    ::careful( "c_IsEnableSwordArts", "checkENSAI()", pattern );
+    std::set<std::string> careful = {};
+    ::carefully( "c_SwordArtsID", "checkSAI()", pattern, careful );
+    ::carefully( "c_SwordArtsHand", "checkSAH()", pattern, careful );
+    ::carefully( "c_IsEnableSwordArts", "checkENSAI()", pattern, careful );
 
-    return common::replace( common::fromw( path ), pattern, true ).second;
+    return common::replace( common::fromw( path ), pattern, true, careful ).second;
 }
 
 void common::hks::hksmain() {
@@ -501,14 +511,3 @@ void common::hks::hksmain() {
         ::SetFileAttributesW( path.c_str(), FILE_ATTRIBUTE_READONLY );
     }
 }
-
-
-// maybe make the first r1 chain into the second r2
-
-// can nothing be done to the startup of r1's, such as the r2?
-
-// maybe make cancels also happen a while into the attack, the only non-cancel window would be the middle of attack
-
-// maybe make staves and catalysts parry
-
-// would be nice to replace horse and ladder sprint with the new keybind

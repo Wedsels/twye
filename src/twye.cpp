@@ -53,6 +53,7 @@ void core() {
     from::CS::SoloParamRepository::wait_for_params( -1 );
     common::write( L"modified game parameters", L" in ", common::params::parammain(), L" microseconds" );
     
+    if ( !common::exclusive ) return;
     ::system( "pause" );
     ShowWindow( ::GetConsoleWindow(), SW_HIDE );
 }
@@ -61,11 +62,8 @@ BOOL DllMain( HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved ) {
     if ( fdwReason == DLL_PROCESS_ATTACH ) {
         common::locateconsole();
 
-        if ( 0 == 0 ) common::write( L"its version up-to-date" );
-        else common::write( L"its version out-of-date" );
-
         if ( ::modpath( hinstDll ) ) {
-            common::write( L"found Modengine at ", common::modengine, L"\nAnd the mod directory at ", common::moddir, L"\nIn ", common::time(), L" microseconds" );
+            common::write( L"found Modengine at ", common::modengine, L"\nand the mod directory at ", common::moddir, L"\nin ", common::time(), L" microseconds" );
             
             common::hks::hksmain();
         } else common::write( L"not found a modengine directory, and will not apply parts of the mod!" );
