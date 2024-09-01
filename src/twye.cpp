@@ -68,7 +68,7 @@ BOOL DllMain( HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved ) {
             common::hks::hksmain();
         } else common::write( L"not found a modengine directory, and will not apply parts of the mod!" );
         
-        ::CreateThread( NULL, 0, ( LPTHREAD_START_ROUTINE )&::core, NULL, 0, NULL );
+        ::CreateThread( NULL, 0, (LPTHREAD_START_ROUTINE)&::core, NULL, 0, NULL );
     }
     return TRUE;
 }

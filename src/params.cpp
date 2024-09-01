@@ -105,6 +105,7 @@ uint64_t common::params::parammain() {
             || row.canMountWep_SwordGigantic
             || row.canMountWep_SwordLarge
             || row.canMountWep_SaberLarge
+            || row.canMountWep_AxhammerLarge
         ) {
             row.canMountWep_GreatKatana = 1;
             row.canMountWep_LightGreatsword = 1;
@@ -113,6 +114,7 @@ uint64_t common::params::parammain() {
             row.canMountWep_SwordGigantic = 1;
             row.canMountWep_SwordLarge = 1;
             row.canMountWep_SaberLarge = 1;
+            row.canMountWep_AxhammerLarge = 1;
         }
         
         row.configurableWepAttr00 =

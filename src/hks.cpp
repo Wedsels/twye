@@ -439,7 +439,7 @@ size_t c0000( std::wstring path ) {
             "\n"
             "    if (env(ActionDuration, ACTION_ARM_L3) >= 250\n"
             "    or env(ActionDuration, ACTION_ARM_L3) > 0 and GetVariable(\"MoveSpeedLevel\") > 0)\n"
-            "    and env(GetStamina) > 5 then\n"
+            "    and env(GetStamina) > 0 then\n"
             "        b_[\"sprint\"] = true\n"
             "    elseif env(ActionCancelRequest, ACTION_ARM_L3) == FALSE then\n"
             "        b_[\"sprint\"] = false\n"
