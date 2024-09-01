@@ -160,13 +160,13 @@ uint64_t common::params::parammain() {
 
         auto& row = from::param::SpEffectParam[20380100].first;
         row.iconId = -1;
-        row.slashDamageCutRate = 1;
-        row.blowDamageCutRate = 1;
-        row.thrustDamageCutRate = 1;
-        row.neutralDamageCutRate = 1;
-        row.magicDamageCutRate = 1;
-        row.fireDamageCutRate = 1;
-        row.thunderDamageCutRate = 1;
+        row.slashDamageCutRate =
+        row.blowDamageCutRate =
+        row.thrustDamageCutRate =
+        row.neutralDamageCutRate =
+        row.magicDamageCutRate =
+        row.fireDamageCutRate =
+        row.thunderDamageCutRate =
         row.darkDamageCutRate = 1;
     }
     {
@@ -175,21 +175,17 @@ uint64_t common::params::parammain() {
 
         right.effectEndurance = 0.01f;
         right.wepParamChange = 1;
-        right.changeStrengthPoint = 5;
-        right.changeAgilityPoint = 5;
-        right.changeMagicPoint = 5;
-        right.changeFaithPoint = 5;
-        right.changeLuckPoint = 5;
-        right.bAdjustStrengthAblity = 1;
-        right.bAdjustAgilityAblity = 1;
-        right.bAdjustMagicAblity = 1;
-        right.bAdjustFaithAblity = 1;
-        right.isUseAtkParamAtkPowerCorrect = 1;
+        right.changeStrengthPoint =
+        right.changeAgilityPoint =
+        right.changeMagicPoint =
+        right.changeFaithPoint =
+        right.changeLuckPoint = 25;
+        right.bAdjustStrengthAblity =
+        right.bAdjustAgilityAblity =
+        right.bAdjustMagicAblity =
+        right.bAdjustFaithAblity =
+        right.isUseAtkParamAtkPowerCorrect =
         right.isUseStatusAilmentAtkPowerCorrect = 1;
-        right.magParamChange = 1;
-        right.miracleParamChange = 1;
-        right.shamanParamChange = 1;
-        // right.throwAttackParamChange = 1;
 
         auto& left = from::param::SpEffectParam[7220].first;
         left = right;
@@ -197,13 +193,13 @@ uint64_t common::params::parammain() {
 
         auto& strengthright = from::param::SpEffectParam[7230].first;
         strengthright = right;
-        strengthright.changeStrengthPoint = -5;
-        strengthright.changeAgilityPoint = 0;
-        strengthright.changeMagicPoint = 0;
-        strengthright.changeFaithPoint = 0;
-        strengthright.changeLuckPoint = 0;
-        right.bAdjustAgilityAblity = 0;
-        right.bAdjustMagicAblity = 0;
+        strengthright.changeStrengthPoint = -4;
+        strengthright.changeAgilityPoint =
+        strengthright.changeMagicPoint =
+        strengthright.changeFaithPoint =
+        strengthright.changeLuckPoint =
+        right.bAdjustAgilityAblity =
+        right.bAdjustMagicAblity =
         right.bAdjustFaithAblity = 0;
 
         auto& strengthleft = from::param::SpEffectParam[7240].first;

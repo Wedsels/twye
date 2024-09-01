@@ -23,7 +23,7 @@ struct TrieCor {
         core = &nodes[0];
     }
     
-    void init( std::vector<std::pair<std::string, std::string>>& strs ) {
+    void initialize( std::vector<std::pair<std::string, std::string>>& strs ) {
         for ( int i=0; i<( int )strs.size(); i++ ) {
             std::string &str = strs[i].first;
             Node* node = core;
@@ -69,7 +69,7 @@ struct TrieCor {
         }
     }
     
-    std::pair<std::pair<std::string, size_t>, std::set<std::string>> process_string( std::string& str ) {
+    std::pair<std::pair<std::string, size_t>, std::set<std::string>> process( std::string& str ) {
         std::set<std::string> gathered = {};
 
         std::string replaced = str;
@@ -103,9 +103,9 @@ struct TrieCor {
 
 std::pair<std::string, size_t> common::aho::replacetext( std::string content, std::vector<std::pair<std::string, std::string>> pattern, std::set<std::string> careful ) {
     TrieCor trie;
-    trie.init( pattern );
+    trie.initialize( pattern );
 
-    auto val = trie.process_string( content );
+    auto val = trie.process( content );
 
     for ( auto i : pattern )
         if ( !val.second.contains( i.first ) && !careful.contains( i.first ) )
