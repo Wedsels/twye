@@ -1,5 +1,7 @@
 # INSTALLATION
 
+- Download https://github.com/soulsmods/ModEngine2/releases
+
 - Put the twye_updater.dll or twye.dll within the modengine directory.
 
 - Edit modengine config_eldenring.toml to include the relative location to the .dll

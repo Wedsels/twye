@@ -444,7 +444,7 @@ size_t c0000( std::wstring path ) {
             "    elseif env(ActionCancelRequest, ACTION_ARM_L3) == FALSE then\n"
             "        b_[\"sprint\"] = false\n"
             "    end\n"
-            "    if env(ActionDuration, ACTION_ARM_R2) > 120 and string.find(b_[\"last\"], \"Heavy.Start\") then\n"
+            "    if env(ActionDuration, ACTION_ARM_R2) > 180 and string.find(b_[\"last\"], \"Heavy.Start\") then\n"
             "        b_[\"last\"] = \"\"\n"
             "    end\n"
             "    if env(ActionDuration, ACTION_ARM_R2) <= 0 and string.find(b_[\"last\"], \"Heavy.Start\") then\n"
@@ -486,9 +486,9 @@ void common::hks::hksmain() {
 
             std::filesystem::create_directories( common::moddir + L"action\\script\\" );
 
-            if ( !::system( common::fromw( L"curl -o \"" + path + L"\" \"https://raw.githubusercontent.com/ividyon/EldenRingHKS/main/" + i + L"\"" ).c_str() ) ) {
+            if ( !::system( common::fromw( L"curl -o \"" + path + L"\" \"https://raw.githubusercontent.com/ividyon/EldenRingHKS/main/" + i + L"\"" ).c_str() ) )
                 common::write( L"succesfully acquired " + i );
-            } else {
+            else {
                 common::write( L"failed to acquire " + i );
                 continue;
             }
@@ -506,7 +506,7 @@ void common::hks::hksmain() {
             std::filesystem::copy_file( path, path + L".bak", std::filesystem::copy_options::overwrite_existing );
 
         if ( i == L"c0000.hks" ) common::write( L"modified and verified ", ::c0000( path ), L" characters for the c0000.hks in ", common::time() , L" microseconds" );
-        if ( i == L"c9997.hks" ) common::write( L"modified and verified ", ::c9997( path ), L" characters for the c0000.hks in ", common::time() , L" microseconds" );
+        if ( i == L"c9997.hks" ) common::write( L"modified and verified ", ::c9997( path ), L" characters for the c9997.hks in ", common::time() , L" microseconds" );
         
         ::SetFileAttributesW( path.c_str(), FILE_ATTRIBUTE_READONLY );
     }

@@ -69,8 +69,11 @@ uint64_t common::params::parammain() {
         row.backhomeDist = 9999;
         row.backhomeBattleDist = 9999;
         
-        row.eye_dist *= 7;
-        row.ear_dist *= 7;
+        row.eye_dist *= 12;
+        row.ear_dist *= 12;
+
+        row.SightTargetForgetTime /= 3.5f;
+        row.MemoryTargetForgetTime /= 3.5f;
     }
 
     for ( auto [id, row] : from::param::EquipParamWeapon ) {
@@ -79,6 +82,7 @@ uint64_t common::params::parammain() {
 
     for ( auto [id, row] : from::param::EquipParamGoods ) {
         if ( row.goodsUseAnim != 16 && row.reinforceMaterialId != 1 ) continue;
+
         from::param::SpEffectParam[row.refId_default].first.cycleOccurrenceSpEffectId = row.refId_1;
         from::param::SpEffectParam[row.refId_1].first.effectEndurance = 0.01f;
     }
@@ -142,12 +146,17 @@ uint64_t common::params::parammain() {
         row.configurableWepAttr22 =
         row.configurableWepAttr23 = 1;
     }
-
     {
         auto& row = from::param::SpEffectParam[100690].first;
-        row.effectEndurance = 4.555f;
+        row.effectEndurance = 4.75f;
         row.stateInfo = 8;
         row.sightSearchEnemyRate = 0;
+    }
+    {
+        auto& row = from::param::SpEffectParam[8001].first;
+        row.effectEndurance = 0.05f;
+        row.stateInfo = 8;
+        row.sightSearchEnemyRate = 0.1f;
     }
     {
         auto& row = from::param::SpEffectParam[350401].first;
@@ -193,7 +202,7 @@ uint64_t common::params::parammain() {
 
         auto& strengthright = from::param::SpEffectParam[7230].first;
         strengthright = right;
-        strengthright.changeStrengthPoint = -4;
+        strengthright.changeStrengthPoint = -5;
         strengthright.changeAgilityPoint =
         strengthright.changeMagicPoint =
         strengthright.changeFaithPoint =
