@@ -156,7 +156,7 @@ uint64_t common::params::parammain() {
         auto& row = from::param::SpEffectParam[8001].first;
         row.effectEndurance = 0.05f;
         row.stateInfo = 8;
-        row.sightSearchEnemyRate = 0.1f;
+        row.sightSearchEnemyRate = 0.05f;
     }
     {
         auto& row = from::param::SpEffectParam[350401].first;
