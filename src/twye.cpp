@@ -1,15 +1,12 @@
-#include "ahocorasick.cpp"
-#include "common.cpp"
-#include "params.cpp"
-#include "hks.cpp"
+#include "common.hpp"
 
-#include <coresystem/cs_param.hpp>
+// #include <coresystem/cs_param.hpp>
 #include <filesystem>
 
 bool modpath( HINSTANCE hinstDll ) {
     common::time();
     
-    LPWSTR dllFilepath = new WCHAR[512];
+    LPWSTR dllFilepath = new WCHAR[ 512 ];
     ::GetModuleFileNameW( hinstDll, dllFilepath, 512 );
 
     std::wstringstream wss;
@@ -49,18 +46,27 @@ bool modpath( HINSTANCE hinstDll ) {
 }
 
 void core() {
-    common::write( L"started waiting for game params..." );
-    from::CS::SoloParamRepository::wait_for_params( -1 );
-    common::write( L"modified game parameters", L" in ", common::params::parammain(), L" microseconds" );
+    // common::write( L"started waiting for game params..." );
+    // if ( from::CS::SoloParamRepository::wait_for_params( 12500 ) )
+    //     common::write( L"modified game parameters", L" in ", common::params::parammain(), L" microseconds" );
+    // else
+    //     common::write( L"failed to modify game parameters" );
     
-    if ( !common::exclusive ) return;
-    ::system( "pause" );
-    ShowWindow( ::GetConsoleWindow(), SW_HIDE );
+    if ( common::debug ) {
+        if ( !common::exclusive ) return;
+        ::system( "pause" );
+        ::ShowWindow( ::GetConsoleWindow(), SW_HIDE );
+    } else {
+        std::wofstream file( common::modengine + L"twye.log" );
+        file << common::nodebug;
+        file.close();
+    }
 }
 
 BOOL DllMain( HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved ) {
     if ( fdwReason == DLL_PROCESS_ATTACH ) {
-        common::locateconsole();
+        if ( common::debug )
+            common::locateconsole();
 
         if ( ::modpath( hinstDll ) ) {
             common::write( L"found Modengine at ", common::modengine, L"\nand the mod directory at ", common::moddir, L"\nin ", common::time(), L" microseconds" );
@@ -68,7 +74,7 @@ BOOL DllMain( HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved ) {
             common::hks::hksmain();
         } else common::write( L"not found a modengine directory, and will not apply parts of the mod!" );
         
-        ::CreateThread( NULL, 0, (LPTHREAD_START_ROUTINE)&::core, NULL, 0, NULL );
+        ::CreateThread( NULL, 0, ( LPTHREAD_START_ROUTINE )&::core, NULL, 0, NULL );
     }
     return TRUE;
 }
