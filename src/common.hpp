@@ -19,6 +19,7 @@ class common {
         static inline uint64_t tracktime;
 
         static inline std::wstring modengine;
+        static inline std::wstring homedir;
         static inline std::wstring moddir;
         
         static inline uint64_t time() {
@@ -50,7 +51,7 @@ class common {
             );
         }
 
-        static inline const bool debug = false;
+        static inline const bool debug = true;
         static inline std::wstring nodebug;
 
         template < typename... T >

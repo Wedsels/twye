@@ -12,6 +12,7 @@ bool modpath( HINSTANCE hinstDll ) {
     std::wstringstream wss;
     wss << dllFilepath;
     common::modengine = wss.str();
+    common::homedir = common::modengine.erase( common::modengine.find_last_of( '\\' ) + 1 );
 
     size_t pos = 0;
     while ( ( pos = common::modengine.find_last_of( '\\' ) ) != std::wstring::npos )
@@ -38,7 +39,7 @@ bool modpath( HINSTANCE hinstDll ) {
             else common::moddir = path;
 
             common::moddir += L"\\";
-            
+
             return true;
         }
 
@@ -69,7 +70,7 @@ BOOL DllMain( HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved ) {
             common::locateconsole();
 
         if ( ::modpath( hinstDll ) ) {
-            common::write( L"found Modengine at ", common::modengine, L"\nand the mod directory at ", common::moddir, L"\nin ", common::time(), L" microseconds" );
+            common::write( L"found Modengine at ", common::modengine, L"\nand the mod directory at ", common::moddir, L"\nfrom within ", common::homedir ,"\nin ", common::time(), L" microseconds" );
             
             common::hks::hksmain();
         } else common::write( L"not found a modengine directory, and will not apply parts of the mod!" );
