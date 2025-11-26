@@ -5,6 +5,7 @@
 #include <Windows.h>
 
 #include <algorithm>
+#include <iostream>
 #include <sstream>
 #include <fstream>
 #include <string>
@@ -14,17 +15,17 @@
 
 class common {
     public:
-        static inline HANDLE stdhandle;
+        static inline ::HANDLE stdhandle;
 
-        static inline uint64_t tracktime;
+        static inline ::uint64_t tracktime;
 
-        static inline std::wstring modengine;
-        static inline std::wstring homedir;
-        static inline std::wstring moddir;
-        
-        static inline uint64_t time() {
-            auto ms = std::chrono::duration_cast< std::chrono::microseconds >( std::chrono::system_clock::now().time_since_epoch() ).count();
-            auto diff = ms - tracktime;
+        static inline ::std::wstring modengine;
+        static inline ::std::wstring homedir;
+        static inline ::std::wstring moddir;
+
+        static inline ::uint64_t time() {
+            long long ms = ::std::chrono::duration_cast< ::std::chrono::microseconds >( ::std::chrono::system_clock::now().time_since_epoch() ).count();
+            long long diff = ms - tracktime;
             tracktime = ms;
 
             return diff;
@@ -35,11 +36,11 @@ class common {
             ::AllocConsole();
 
             if ( !exclusive ) {
-                FILE* out;
-                freopen_s( &out, "CON", "w", stdout );
+                ::FILE* out;
+                ::freopen_s( &out, "CON", "w", stdout );
                 return;
             }
-            
+
             ::SetConsoleActiveScreenBuffer (
                 stdhandle = ::CreateConsoleScreenBuffer(
                     GENERIC_READ | GENERIC_WRITE,
@@ -51,40 +52,40 @@ class common {
             );
         }
 
-        static inline const bool debug = true;
-        static inline std::wstring nodebug;
+        static inline const bool debug = false;
+        static inline ::std::wstring nodebug;
 
         template < typename... T >
         static inline void write( T... content ) {
-            std::wstringstream wss;
+            ::std::wstringstream wss;
             wss << L"twye has ";
             ( wss << ... << content ) << "\n\n";
 
             if ( !debug )
                 nodebug += wss.str();
             else if ( !exclusive )
-                ::printf( fromw( wss.str() ).c_str() );
+                ::std::wcout << fromw( wss.str() ).c_str();
             else
-                ::WriteConsoleW( stdhandle, wss.str().c_str(), ( DWORD )wss.str().size(), NULL, NULL );
+                ::WriteConsoleW( stdhandle, wss.str().c_str(), ( ::DWORD )wss.str().size(), NULL, NULL );
         }
 
-        static inline std::pair< std::string, size_t > replace( std::string string, std::vector< std::pair< std::string, std::string > > pattern, bool file, std::set< std::string > careful = {} ) {
-            std::string content = string;
+        static inline ::std::pair< ::std::string, ::size_t > replace( ::std::string string, ::std::vector< ::std::pair< ::std::string, ::std::string > > pattern, bool file, ::std::set< ::std::string > careful = {} ) {
+            ::std::string content = string;
 
             if ( file ) {
-                std::ifstream inputFile( string );
+                ::std::ifstream inputFile( string );
 
-                std::stringstream ss;
+                ::std::stringstream ss;
                 ss << inputFile.rdbuf();
                 content = ss.str();
-                
+
                 inputFile.close();
             }
 
-            auto result = common::aho::replacetext( content, pattern, careful );
+            ::std::pair< ::std::string, ::size_t > result = ::common::aho::replacetext( content, pattern, careful );
 
             if ( file ) {
-                std::ofstream outputFile( string, std::ios::trunc );
+                ::std::ofstream outputFile( string, ::std::ios::trunc );
                 outputFile << result.first;
                 outputFile.close();
             }
@@ -92,14 +93,14 @@ class common {
             return { content, result.second };
         }
 
-        static inline std::string fromw( std::wstring string ) {
-            std::string result( string.length(), 0 );
-            std::transform( string.begin(), string.end(), result.begin(), [] ( wchar_t c ) { return ( char )c; } );
+        static inline ::std::string fromw( ::std::wstring string ) {
+            ::std::string result( string.length(), 0 );
+            ::std::transform( string.begin(), string.end(), result.begin(), [] ( wchar_t c ) { return ( char )c; } );
             return result;
         }
-    
+
     class params {
-        public: static uint64_t parammain();
+        public: static ::uint64_t parammain();
     };
 
     class hks {
@@ -109,7 +110,7 @@ class common {
 
     class aho {
         public:
-            static std::pair< std::string, size_t > replacetext( std::string content, std::vector< std::pair< std::string, std::string > > pattern, std::set< std::string > careful );
+            static ::std::pair< ::std::string, ::size_t > replacetext( ::std::string content, ::std::vector< ::std::pair< ::std::string, ::std::string > > pattern, ::std::set< ::std::string > careful );
     };
 
     class twye {

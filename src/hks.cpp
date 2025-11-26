@@ -2,36 +2,37 @@
 
 #include <filesystem>
 
-void carefully( std::string original, std::string replace, std::vector< std::pair< std::string, std::string > >& target, std::set< std::string >& careful ) {
+void carefully( ::std::string original, ::std::string replace, ::std::vector< ::std::pair< ::std::string, ::std::string > >& target, ::std::set< ::std::string >& careful ) {
     target.push_back( { "= " + original, "= " + replace } );
     target.push_back( { original + " ==", replace + " ==" } );
-    target.push_back( { "(" + original + ")", "(" + replace + ")" } );
-    target.push_back( { "[" + original + "]", "[" + replace + "]" } );
-    target.push_back( { "(" + original + ",", "(" + replace + "," } );
-    target.push_back( { " " + original + ")", " " + replace + ")" } );
+    target.push_back( { "( " + original + " )", "( " + replace + " )" } );
+    target.push_back( { "[ " + original + " ]", "[ " + replace + " ]" } );
+    target.push_back( { "( " + original + ",", "( " + replace + "," } );
+    target.push_back( { " " + original + " )", " " + replace + " )" } );
 
     careful.emplace( "= " + original );
     careful.emplace( original + " ==" );
-    careful.emplace( "(" + original + ")" );
-    careful.emplace( "[" + original + "]" );
-    careful.emplace( "(" + original + "," );
-    careful.emplace( " " + original + ")" );
+    careful.emplace( "( " + original + " )" );
+    careful.emplace( "[ " + original + " ]" );
+    careful.emplace( "( " + original + "," );
+    careful.emplace( " " + original + " )" );
 }
 
-size_t c9997( std::wstring path ) {
-    std::vector< std::pair< std::string, std::string > > pattern =
+::size_t c9997( ::std::wstring path ) {
+    ::std::vector< ::std::pair< ::std::string, ::std::string > > pattern =
     {
         { "env(GetDamageLevel)", "TakeABreath()" },
         {
             "function Update()",
             "function TakeABreath()\n"
             "    local level = env(GetDamageLevel)\n"
+            "    breath = os.clock()\n"
+            "    damagelevelers[level] = damagelevelers[level] or 0\n"
             "    if breath - damagelevelers[level] > 1 then\n"
-            "        breath = os.clock()\n"
+            "        damagelevelers[level] = breath\n"
             "    else\n"
-            "        level = DAMAGE_LEVEL_NONE\n"
+            "        level = 0\n"
             "    end\n"
-            "    damagelevelers[level] = breath\n"
             "    return level\n"
             "end\n"
             "\n"
@@ -40,36 +41,22 @@ size_t c9997( std::wstring path ) {
         {
             "global = {}",
             "breath = os.clock()\n"
-            "damagelevelers = {\n"
-            "    [DAMAGE_LEVEL_NONE] = 0,\n"
-            "    [DAMAGE_LEVEL_SMALL] = 0,\n"
-            "    [DAMAGE_LEVEL_MIDDLE] = 0,\n"
-            "    [DAMAGE_LEVEL_LARGE] = 0,\n"
-            "    [DAMAGE_LEVEL_LARGE_BLOW] = 0,\n"
-            "    [DAMAGE_LEVEL_PUSH] = 0,\n"
-            "    [DAMAGE_LEVEL_FLING] = 0,\n"
-            "    [DAMAGE_LEVEL_SMALL_BLOW] = 0,\n"
-            "    [DAMAGE_LEVEL_MINIMUM] = 0,\n"
-            "    [DAMAGE_LEVEL_UPPER] = 0,\n"
-            "    [DAMAGE_LEVEL_EX_BLAST] = 0,\n"
-            "    [DAMAGE_LEVEL_BREATH] = 0,\n"
-            "}\n"
-            "\n"
+            "damagelevelers = {}\n"
             "global = {}"
         },
     };
 
-    return common::replace( common::fromw( path ), pattern , true, {} ).second;
+    return ::common::replace( ::common::fromw( path ), pattern , true, {} ).second;
 }
 
-size_t c0000( std::wstring path ) {
-    std::set< std::string > careful;
-    std::vector< std::pair< std::string, std::string > > pattern;
+::size_t c0000( ::std::wstring path ) {
+    ::std::set< ::std::string > careful;
+    ::std::vector< ::std::pair< ::std::string, ::std::string > > pattern;
     ::carefully( "Unknown163", "SetCanChangeEquipmentOff", pattern, careful );
     ::carefully( "SetIsEquipmentMenuAccessOff", "SetCanChangeEquipmentOff", pattern, careful );
 
     pattern.append_range(
-        std::vector< std::pair< std::string, std::string > > {
+        ::std::vector< ::std::pair< ::std::string, ::std::string > > {
     // powerstance
             { "env(ActionRequest, ACTION_ARM_R1)", "checkR1()" },
             { "env(ActionRequest, ACTION_ARM_L1)", "checkL1()" },
@@ -93,6 +80,10 @@ size_t c0000( std::wstring path ) {
             // { "arts_cat ==", "checkSAI() ~= 92 and arts_cat ==" },
             { "arts_cat == WEAPON_CATEGORY_SHORT_SWORD", "arts_cat == dagger or checkSAI() == 92 and parriers[wep_cat] == dagger" },
             { "arts_cat == WEAPON_CATEGORY_CURVEDSWORD", "arts_cat == curved or checkSAI() == 92 and parriers[wep_cat] == curved" },
+            {
+                "IsShieldArts(weaponswordartid) == FALSE and IsArrowStanceArts(weaponswordartid) == FALSE",
+                "IsShieldArts(weaponswordartid) == FALSE and IsArrowStanceArts(weaponswordartid) == FALSE and (CanDualParry() == nil or env(ActionDuration, ACTION_ARM_L2) > 0)"
+            },
             {
                 "function GetHandChangeType(hand)",
                 "function GetHandChangeType(hand)\n"
@@ -281,19 +272,16 @@ size_t c0000( std::wstring path ) {
             { "function Rolling_onUpdate()", "function Rolling_onUpdate()\n     act(LockonFixedAngleCancel)" },
             { "function Rolling_Selftrans_onUpdate()", "function Rolling_Selftrans_onUpdate()\n     act(LockonFixedAngleCancel)" },
             {
-            
                 "\"W_AttackRightBackstep\", \"W_AttackRightHeavy1Start\",\n"
                 "        \"W_AttackLeftLight1\", \"W_AttackLeftHeavy1\", \"W_AttackBothBackstep\", \"W_AttackBothHeavy1Start\",",
                 "\"W_AttackRightBackstep\", \"W_AttackRightHeavyDash\",\n"
                 "        \"W_AttackLeftLight1\", \"W_AttackLeftHeavy1\", \"W_AttackBothBackstep\", \"W_AttackBothHeavyDash\","
             },
             {
-            
                 "            if env(GetSpEffectID, 100020) == TRUE then",
                 "            if env(GetSpEffectID, 100020) == TRUE and env(IsOnMount) == TRUE then"
             },
             {
-            
                 "                SetVariable(\"ToggleDash\", 0)\n            else",
                 "                SetVariable(\"ToggleDash\", 0)\n            elseif env(IsOnMount) == TRUE then"
             },
@@ -331,9 +319,9 @@ size_t c0000( std::wstring path ) {
                 "    end\n"
                 "    if string.find(b_[\"last\"], \"Start\") then\n"
                 "        if string.find(b_[\"last\"], \"Heavy\") or string.find(b_[\"last\"], \"Ride\") and string.find(b_[\"last\"], \"Hard\") then\n"
-                "            if env(ActionDuration, ACTION_ARM_R2) > 240 then\n"
+                "            if env(ActionDuration, ACTION_ARM_R2) > 240 or env(ActionDuration, ACTION_ARM_L2) > 240 then\n"
                 "                b_[\"last\"] = \"\"\n"
-                "            elseif env(ActionDuration, ACTION_ARM_R2) <= 0 then\n"
+                "            elseif env(ActionDuration, ACTION_ARM_R2) <= 0 and env(ActionDuration, ACTION_ARM_L2) <= 0 then\n"
                 "                ExecEventAllBody(b_[\"last\"]:gsub(\"Start\", \"End\"))\n\n"
                 "            end\n"
                 "        elseif string.find(b_[\"last\"], \"Arts\") or string.find(b_[\"last\"], \"Attack\") then\n"
@@ -360,21 +348,7 @@ size_t c0000( std::wstring path ) {
                 "cancelwait = 0\n"
                 "\n"
                 "breath = os.clock()\n"
-                "damagelevelers = {\n"
-                "    [DAMAGE_LEVEL_NONE] = 0,\n"
-                "    [DAMAGE_LEVEL_SMALL] = 0,\n"
-                "    [DAMAGE_LEVEL_MIDDLE] = 0,\n"
-                "    [DAMAGE_LEVEL_LARGE] = 0,\n"
-                "    [DAMAGE_LEVEL_LARGE_BLOW] = 0,\n"
-                "    [DAMAGE_LEVEL_PUSH] = 0,\n"
-                "    [DAMAGE_LEVEL_FLING] = 0,\n"
-                "    [DAMAGE_LEVEL_SMALL_BLOW] = 0,\n"
-                "    [DAMAGE_LEVEL_MINIMUM] = 0,\n"
-                "    [DAMAGE_LEVEL_UPPER] = 0,\n"
-                "    [DAMAGE_LEVEL_EX_BLAST] = 0,\n"
-                "    [DAMAGE_LEVEL_BREATH] = 0,\n"
-                "}\n"
-                "\n"
+                "damagelevelers = {}\n"
                 "global = {}"
             },
             { "env(GetDamageLevel)", "TakeABreath()" },
@@ -382,12 +356,13 @@ size_t c0000( std::wstring path ) {
                 "function Update()",
                 "function TakeABreath()\n"
                 "    local level = env(GetDamageLevel)\n"
+                "    breath = os.clock()\n"
+                "    damagelevelers[level] = damagelevelers[level] or 0\n"
                 "    if breath - damagelevelers[level] > 1 then\n"
-                "        breath = os.clock()\n"
+                "        damagelevelers[level] = breath\n"
                 "    else\n"
-                "        level = DAMAGE_LEVEL_NONE\n"
+                "        level = 0\n"
                 "    end\n"
-                "    damagelevelers[level] = breath\n"
                 "    return level\n"
                 "end\n"
                 "\n"
@@ -409,7 +384,7 @@ size_t c0000( std::wstring path ) {
                 "        local redrawl1 = false\n"
                 "\n"
                 "        for k,_ in pairs(l1clock) do\n"
-                "            if l1rest[k] == nil or l1rest[k] > (g_FrameCount - l1clock[k]) ^ (1 / l1scale) then\n"
+                "            if l1rest[k] == nil or l1rest[k] > (0.8 + g_FrameCount - l1clock[k]) ^ (1.0 / l1scale) then\n"
                 "                l1rest[k] = g_FrameCount - l1clock[k]\n"
                 "                redrawl1 = true\n"
                 "            end\n"
@@ -553,17 +528,17 @@ size_t c0000( std::wstring path ) {
         }
     );
 
-    std::ifstream t( common::homedir + L"twye_options.txt" );
-    std::stringstream buffer;
+    ::std::ifstream t( ::common::homedir + L"twye_options.txt" );
+    ::std::stringstream buffer;
     buffer << t.rdbuf();
     pattern.push_back( {
         "global = {}",
         buffer.str() + "\n"
         "attackrequests = {\n"
-        "    [ACTION_ARM_R1] = FALSE,\n"
-        "    [ACTION_ARM_R2] = FALSE,\n"
-        "    [ACTION_ARM_L1] = FALSE,\n"
-        "    [ACTION_ARM_L2] = FALSE,\n"
+        "    [ ACTION_ARM_R1 ] = FALSE,\n"
+        "    [ ACTION_ARM_R2 ] = FALSE,\n"
+        "    [ ACTION_ARM_L1 ] = FALSE,\n"
+        "    [ ACTION_ARM_L2 ] = FALSE,\n"
         "}\n"
         "\n"
         "global = {}"
@@ -573,24 +548,24 @@ size_t c0000( std::wstring path ) {
     ::carefully( "c_SwordArtsHand", "checkSAH()", pattern, careful );
     ::carefully( "c_IsEnableSwordArts", "checkENSAI()", pattern, careful );
 
-    return common::replace( common::fromw( path ), pattern, true, careful ).second;
+    return ::common::replace( ::common::fromw( path ), pattern, true, careful ).second;
 }
 
-void common::hks::hksmain() {
-    for ( std::wstring i : { L"c0000.hks", L"c9997.hks" } ) {
-        common::time();
+void ::common::hks::hksmain() {
+    for ( ::std::wstring i : { L"c0000.hks", L"c9997.hks" } ) {
+        ::common::time();
 
-        auto path = common::moddir + L"action\\script\\" + i;
-        
-        if ( !std::filesystem::exists( path ) ) {
-            common::write( L"found missing files, acquiring " + i );
+        ::std::wstring path = ::common::moddir + L"action\\script\\" + i;
 
-            std::filesystem::create_directories( common::moddir + L"action\\script\\" );
+        if ( !::std::filesystem::exists( path ) ) {
+            ::common::write( L"found missing files, acquiring " + i );
 
-            if ( !::system( common::fromw( L"curl -o \"" + path + L"\" \"https://raw.githubusercontent.com/ividyon/EldenRingHKS/main/" + i + L"\"" ).c_str() ) )
-                common::write( L"succesfully acquired " + i );
+            ::std::filesystem::create_directories( ::common::moddir + L"action\\script\\" );
+
+            if ( !::system( ::common::fromw( L"curl -o \"" + path + L"\" \"https://raw.githubusercontent.com/ividyon/EldenRingHKS/main/" + i + L"\"" ).c_str() ) )
+                ::common::write( L"succesfully acquired " + i );
             else {
-                common::write( L"failed to acquire " + i );
+                ::common::write( L"failed to acquire " + i );
                 continue;
             }
         }
@@ -601,14 +576,14 @@ void common::hks::hksmain() {
         if ( read ) attributes &= ~FILE_ATTRIBUTE_READONLY;
         ::SetFileAttributesW( path.c_str(), attributes );
 
-        if ( read && std::filesystem::exists( path + L".bak" ) )
-            std::filesystem::copy_file( path + L".bak", path, std::filesystem::copy_options::overwrite_existing );
+        if ( read && ::std::filesystem::exists( path + L".bak" ) )
+            ::std::filesystem::copy_file( path + L".bak", path, ::std::filesystem::copy_options::overwrite_existing );
         else
-            std::filesystem::copy_file( path, path + L".bak", std::filesystem::copy_options::overwrite_existing );
+            ::std::filesystem::copy_file( path, path + L".bak", ::std::filesystem::copy_options::overwrite_existing );
 
-        if ( i == L"c0000.hks" ) common::write( L"modified and verified ", ::c0000( path ), L" characters for the c0000.hks in ", common::time() , L" microseconds" );
-        if ( i == L"c9997.hks" ) common::write( L"modified and verified ", ::c9997( path ), L" characters for the c9997.hks in ", common::time() , L" microseconds" );
-        
+        if ( i == L"c0000.hks" ) ::common::write( L"modified and verified ", ::c0000( path ), L" characters for the c0000.hks in ", ::common::time() , L" microseconds" );
+        if ( i == L"c9997.hks" ) ::common::write( L"modified and verified ", ::c9997( path ), L" characters for the c9997.hks in ", ::common::time() , L" microseconds" );
+
         ::SetFileAttributesW( path.c_str(), FILE_ATTRIBUTE_READONLY );
     }
 }

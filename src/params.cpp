@@ -2,52 +2,52 @@
 
 #include <param/param.hpp>
 
-void basesp( from::paramdef::SP_EFFECT_PARAM_ST& row ) {
-    row = from::param::SpEffectParam[ 0 ].first;
+void basesp( ::from::paramdef::SP_EFFECT_PARAM_ST& row ) {
+    row = ::from::param::SpEffectParam[ 0 ].first;
 
     row.effectEndurance =
     row.isDisableNetSync = 0;
-    row.hpRecoverRate = 
-    row.equipWeightChangeRate = 
-    row.soulRate = 
-    row.fallDamageRate = 
-    row.lifeReductionRate = 
-    row.effectTargetSelf = 
-    row.effectTargetFriend = 
-    row.effectTargetEnemy = 
-    row.effectTargetPlayer = 
-    row.effectTargetAI = 
-    row.effectTargetLive = 
-    row.effectTargetGhost = 
-    row.effectTargetOpposeTarget = 
-    row.effectTargetFriendlyTarget = 
-    row.effectTargetSelfTarget = 
-    row.isIgnoreNoDamage = 
-    row.allItemWeightChangeRate = 
-    row.soulStealRate = 
-    row.isDisableNetSync = 
-    row.vowType0 = 
-    row.vowType1 = 
-    row.vowType2 = 
-    row.vowType3 = 
-    row.vowType4 = 
-    row.vowType5 = 
-    row.vowType6 = 
-    row.vowType7 = 
-    row.vowType8 = 
-    row.vowType9 = 
-    row.vowType10 = 
-    row.vowType11 = 
-    row.vowType12 = 
-    row.vowType13 = 
-    row.vowType14 = 
+    row.hpRecoverRate =
+    row.equipWeightChangeRate =
+    row.soulRate =
+    row.fallDamageRate =
+    row.lifeReductionRate =
+    row.effectTargetSelf =
+    row.effectTargetFriend =
+    row.effectTargetEnemy =
+    row.effectTargetPlayer =
+    row.effectTargetAI =
+    row.effectTargetLive =
+    row.effectTargetGhost =
+    row.effectTargetOpposeTarget =
+    row.effectTargetFriendlyTarget =
+    row.effectTargetSelfTarget =
+    row.isIgnoreNoDamage =
+    row.allItemWeightChangeRate =
+    row.soulStealRate =
+    row.isDisableNetSync =
+    row.vowType0 =
+    row.vowType1 =
+    row.vowType2 =
+    row.vowType3 =
+    row.vowType4 =
+    row.vowType5 =
+    row.vowType6 =
+    row.vowType7 =
+    row.vowType8 =
+    row.vowType9 =
+    row.vowType10 =
+    row.vowType11 =
+    row.vowType12 =
+    row.vowType13 =
+    row.vowType14 =
     row.vowType15 = 1;
 }
 
-uint64_t common::params::parammain() {
-    common::time();
+::uint64_t common::params::parammain() {
+    ::common::time();
 
-    for ( auto [ id, row ] : from::param::Bullet ) {
+    for ( auto [ id, row ] : ::from::param::Bullet ) {
         if ( row.isAttackSFX != 1 || row.isPenetrateChr + row.isPenetrateMap + row.isPenetrateObj > 0 || row.life < 5 || row.atkAttribute != 54 || row.atkId_Bullet == -1 ) continue;
 
         row.life *= 5;
@@ -64,11 +64,11 @@ uint64_t common::params::parammain() {
         row.knockbackDamp = -128;
     }
 
-    for ( auto [ id, row ] : from::param::NpcThinkParam ) {
+    for ( auto [ id, row ] : ::from::param::NpcThinkParam ) {
         row.maxBackhomeDist = 9999;
         row.backhomeDist = 9999;
         row.backhomeBattleDist = 9999;
-        
+
         row.eye_dist *= 12;
         row.ear_dist *= 12;
 
@@ -76,18 +76,18 @@ uint64_t common::params::parammain() {
         row.MemoryTargetForgetTime /= 3.5f;
     }
 
-    for ( auto [ id, row ] : from::param::EquipParamWeapon ) {
+    for ( auto [ id, row ] : ::from::param::EquipParamWeapon ) {
         row.isEnhance = 1;
     }
 
-    for ( auto [ id, row ] : from::param::EquipParamGoods ) {
+    for ( auto [ id, row ] : ::from::param::EquipParamGoods ) {
         if ( row.goodsUseAnim != 16 && row.reinforceMaterialId != 1 ) continue;
 
-        from::param::SpEffectParam[ row.refId_default ].first.cycleOccurrenceSpEffectId = row.refId_1;
-        from::param::SpEffectParam[ row.refId_1 ].first.effectEndurance = 0.01f;
+        ::from::param::SpEffectParam[ row.refId_default ].first.cycleOccurrenceSpEffectId = row.refId_1;
+        ::from::param::SpEffectParam[ row.refId_1 ].first.effectEndurance = 0.01f;
     }
 
-    for ( auto [ id, row ] : from::param::EquipParamGem ) {
+    for ( auto [ id, row ] : ::from::param::EquipParamGem ) {
         if ( row.canMountWep_Claw
             || row.canMountWep_Dagger
             || row.canMountWep_katana
@@ -120,7 +120,7 @@ uint64_t common::params::parammain() {
             row.canMountWep_SaberLarge = 1;
             row.canMountWep_AxhammerLarge = 1;
         }
-        
+
         row.configurableWepAttr00 =
         row.configurableWepAttr01 =
         row.configurableWepAttr02 =
@@ -147,27 +147,27 @@ uint64_t common::params::parammain() {
         row.configurableWepAttr23 = 1;
     }
     {
-        auto& row = from::param::SpEffectParam[ 100690 ].first;
+        auto& row = ::from::param::SpEffectParam[ 100690 ].first;
         row.effectEndurance = 4.75f;
         row.stateInfo = 8;
         row.sightSearchEnemyRate = 0;
     }
     {
-        auto& row = from::param::SpEffectParam[ 8001 ].first;
+        auto& row = ::from::param::SpEffectParam[ 8001 ].first;
         row.effectEndurance = 0.05f;
         row.stateInfo = 8;
         row.sightSearchEnemyRate = 0.05f;
     }
     {
-        auto& row = from::param::SpEffectParam[ 350401 ].first;
+        auto& row = ::from::param::SpEffectParam[ 350401 ].first;
         row.changeStaminaRate = row.changeHpRate = ( row.changeMpRate = -4 ) * 2;
         row.changeStaminaPoint = row.changeHpPoint = ( row.changeMpPoint = -6 ) * 4;
     }
     {
-        from::param::SpEffectParam[ 102000 ].first.vfxId = -1;
-        from::param::SpEffectParam[ 102000 ].first.iconId = -1;
+        ::from::param::SpEffectParam[ 102000 ].first.vfxId = -1;
+        ::from::param::SpEffectParam[ 102000 ].first.iconId = -1;
 
-        auto& row = from::param::SpEffectParam[ 20380100 ].first;
+        auto& row = ::from::param::SpEffectParam[ 20380100 ].first;
         row.iconId = -1;
         row.slashDamageCutRate =
         row.blowDamageCutRate =
@@ -179,7 +179,7 @@ uint64_t common::params::parammain() {
         row.darkDamageCutRate = 1;
     }
     {
-        auto& right = from::param::SpEffectParam[ 7210 ].first;
+        auto& right = ::from::param::SpEffectParam[ 7210 ].first;
         basesp( right );
 
         right.effectEndurance = 0.01f;
@@ -196,11 +196,11 @@ uint64_t common::params::parammain() {
         right.isUseAtkParamAtkPowerCorrect =
         right.isUseStatusAilmentAtkPowerCorrect = 1;
 
-        auto& left = from::param::SpEffectParam[ 7220 ].first;
+        auto& left = ::from::param::SpEffectParam[ 7220 ].first;
         left = right;
         left.wepParamChange = 2;
 
-        auto& strengthright = from::param::SpEffectParam[ 7230 ].first;
+        auto& strengthright = ::from::param::SpEffectParam[ 7230 ].first;
         strengthright = right;
         strengthright.changeStrengthPoint = -5;
         strengthright.changeAgilityPoint =
@@ -211,10 +211,10 @@ uint64_t common::params::parammain() {
         right.bAdjustMagicAblity =
         right.bAdjustFaithAblity = 0;
 
-        auto& strengthleft = from::param::SpEffectParam[ 7240 ].first;
+        auto& strengthleft = ::from::param::SpEffectParam[ 7240 ].first;
         strengthleft = strengthright;
         strengthleft.wepParamChange = 2;
     }
-    
-    return common::time();
+
+    return ::common::time();
 }

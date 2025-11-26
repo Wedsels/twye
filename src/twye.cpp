@@ -3,42 +3,42 @@
 // #include <coresystem/cs_param.hpp>
 #include <filesystem>
 
-bool modpath( HINSTANCE hinstDll ) {
-    common::time();
-    
-    LPWSTR dllFilepath = new WCHAR[ 512 ];
+bool modpath( ::HINSTANCE hinstDll ) {
+    ::common::time();
+
+    ::LPWSTR dllFilepath = ::new ::WCHAR[ 512 ];
     ::GetModuleFileNameW( hinstDll, dllFilepath, 512 );
 
-    std::wstringstream wss;
+    ::std::wstringstream wss;
     wss << dllFilepath;
-    common::modengine = wss.str();
-    common::homedir = common::modengine.erase( common::modengine.find_last_of( '\\' ) + 1 );
+    ::common::modengine = wss.str();
+    ::common::homedir = ::common::modengine.erase( ::common::modengine.find_last_of( '\\' ) + 1 );
 
-    size_t pos = 0;
-    while ( ( pos = common::modengine.find_last_of( '\\' ) ) != std::wstring::npos )
-        if ( std::filesystem::exists( ( common::modengine.erase( pos ) + L"\\config_eldenring.toml" ).c_str() ) ) {
-            common::modengine += L"\\";
+    ::size_t pos = 0;
+    while ( ( pos = ::common::modengine.find_last_of( '\\' ) ) != ::std::wstring::npos )
+        if ( ::std::filesystem::exists( ( ::common::modengine.erase( pos ) + L"\\config_eldenring.toml" ).c_str() ) ) {
+            ::common::modengine += L"\\";
 
-            std::wifstream inputFile( common::modengine + L"config_eldenring.toml" );
+            ::std::wifstream inputFile( ::common::modengine + L"config_eldenring.toml" );
 
-            std::wstringstream wss;
+            ::std::wstringstream wss;
             wss << inputFile.rdbuf();
-            std::wstring content = wss.str();
-            
+            ::std::wstring content = wss.str();
+
             inputFile.close();
 
-            size_t offset = content.find( L"\nmods = [" );
-            if ( offset == std::string::npos ) common::moddir = common::modengine + L"mod\\";
+            ::size_t offset = content.find( L"\nmods = [" );
+            if ( offset == ::std::string::npos ) ::common::moddir = ::common::modengine + L"mod\\";
             offset = content.find( L"path = \"", offset );
-            if ( offset == std::string::npos ) common::moddir = common::modengine + L"mod\\";
+            if ( offset == ::std::string::npos ) ::common::moddir = ::common::modengine + L"mod\\";
             offset += 8;
 
-            std::wstring path = content.substr( offset, content.find( L"\"", offset ) - offset  );
-            
-            if ( path.find( L":\\" ) == std::string::npos ) common::moddir = common::modengine + path;
-            else common::moddir = path;
+            ::std::wstring path = content.substr( offset, content.find( L"\"", offset ) - offset  );
 
-            common::moddir += L"\\";
+            if ( path.find( L":\\" ) == ::std::string::npos ) ::common::moddir = ::common::modengine + path;
+            else ::common::moddir = path;
+
+            ::common::moddir += L"\\";
 
             return true;
         }
@@ -47,35 +47,35 @@ bool modpath( HINSTANCE hinstDll ) {
 }
 
 void core() {
-    // common::write( L"started waiting for game params..." );
+    // ::common::write( L"started waiting for game params..." );
     // if ( from::CS::SoloParamRepository::wait_for_params( 12500 ) )
-    //     common::write( L"modified game parameters", L" in ", common::params::parammain(), L" microseconds" );
+    //     ::common::write( L"modified game parameters", L" in ", ::common::params::parammain(), L" microseconds" );
     // else
-    //     common::write( L"failed to modify game parameters" );
-    
-    if ( common::debug ) {
-        if ( !common::exclusive ) return;
+    //     ::common::write( L"failed to modify game parameters" );
+
+    if ( ::common::debug ) {
+        if ( !::common::exclusive ) return;
         ::system( "pause" );
         ::ShowWindow( ::GetConsoleWindow(), SW_HIDE );
     } else {
-        std::wofstream file( common::modengine + L"twye.log" );
-        file << common::nodebug;
+        ::std::wofstream file( ::common::modengine + L"twye.log" );
+        file << ::common::nodebug;
         file.close();
     }
 }
 
-BOOL DllMain( HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved ) {
+::BOOL DllMain( ::HINSTANCE hinstDll, ::DWORD fdwReason, ::LPVOID lpvReserved ) {
     if ( fdwReason == DLL_PROCESS_ATTACH ) {
-        if ( common::debug )
-            common::locateconsole();
+        if ( ::common::debug )
+            ::common::locateconsole();
 
         if ( ::modpath( hinstDll ) ) {
-            common::write( L"found Modengine at ", common::modengine, L"\nand the mod directory at ", common::moddir, L"\nfrom within ", common::homedir ,"\nin ", common::time(), L" microseconds" );
-            
-            common::hks::hksmain();
-        } else common::write( L"not found a modengine directory, and will not apply parts of the mod!" );
-        
-        ::CreateThread( NULL, 0, ( LPTHREAD_START_ROUTINE )&::core, NULL, 0, NULL );
+            ::common::write( L"found Modengine at ", ::common::modengine, L"\nand the mod directory at ", ::common::moddir, L"\nfrom within ", ::common::homedir ,"\nin ", ::common::time(), L" microseconds" );
+
+            ::common::hks::hksmain();
+        } else ::common::write( L"not found a modengine directory, and will not apply parts of the mod!" );
+
+        ::CreateThread( NULL, 0, ( ::LPTHREAD_START_ROUTINE )&::core, NULL, 0, NULL );
     }
     return TRUE;
 }
